@@ -1,0 +1,33 @@
+require(maps)
+require(hier.part)
+#Carregr dados das redes 
+dados=read.table(pipe("pbpaste"), sep="\t", header=T);dados
+
+###extrair os dados climaticos
+#aqui tem bio 1 (temperatura anual), 7(Range na variaçao da temperatura anual) 
+#e 12 (Precipitação)
+# Se não me engano tem que dividir a temperatura por 4, mas vou confirmar
+
+
+r = getData("worldclim",var="bio",res=10)
+r = r[[c(1,7,12)]]
+names(r) = c("Temperatura", "range", "precipitacao")
+coords = data.frame(dados$Lon,dados$Lat)
+coords=na.omit(coords)
+
+points = SpatialPoints(coords, proj4string = r@crs)
+
+values = extract(r,points)
+
+df.climatic.data = cbind.data.frame(coordinates(points),values);df.climatic.data
+
+### Modelos hieraquicos
+## Isso vai te dar duas coisas:
+#I, the independent and J the joint contribution for each independent variable
+#$I.perc que é a proporçao explicada independetemente por cad a variavel
+### o grafico que vai sair é isso, a proporçao
+## Modelos
+hier.part(dados$NODF,df.climatic.data)
+hier.part(dados$CON,df.climatic.data)
+hier.part(dados$MOD,df.climatic.data)
+
