@@ -1,0 +1,26 @@
+require(vegan)
+#copiar e colar do excel no mac
+dados=read.table(pipe("pbpaste"), sep="\t", header=T);dados
+
+#ca do vegan (Não tenho certeza dos parametros)
+#nMDS
+ordenacao = metaMDS(dados[,-1], distance = "jac")
+#CA
+ordenacao = cca(dados[,-1], scale = TRUE)
+#plot
+#criar um plot vazio
+ordiplot(ordenacao,type="n")
+## definir o que é o tratamento dos sitios ( mudei no excel para tres categorias )
+treat=as.factor(dados$fator)
+with(dados, levels(treat))
+
+#parametros de cor e scalonamento
+scl = 1 ## scaling = 1
+colvec = c("red2", "black", "mediumblue")
+##graf
+with(dados, points(ordenacao, display = "sites", col = colvec[treat],
+                      scaling = scl, pch = 21, bg = colvec[treat]))
+text(ordenacao, display = "species", scaling = scl, cex = 0.8, col = "darkcyan")
+with(dados, legend("topright", legend = levels(treat), bty = "n",
+                      col = colvec, pch = 21, pt.bg = colvec))
+
